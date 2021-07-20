@@ -1,4 +1,9 @@
 const admin = require("firebase-admin");
 admin.initializeApp();
 const db = admin.firestore();
-module.exports = { admin, db };
+
+const mysql = require('mysql');
+const { mysqlConfig } = require('./config')
+const mysqldb = mysql.createConnection(mysqlConfig);
+
+module.exports = { admin, db, mysqldb};

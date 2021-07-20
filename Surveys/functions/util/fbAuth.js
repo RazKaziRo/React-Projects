@@ -1,4 +1,6 @@
-const { admin, db } = require("./admin");
+const { admin, db, mysqldb } = require("./admin");
+const firebase = require("firebase");
+const { user } = require("firebase-functions/lib/providers/auth");
 
 module.exports = (req, res, next) => {
   let idToken;
@@ -16,18 +18,16 @@ module.exports = (req, res, next) => {
     .verifyIdToken(idToken)
     .then((decodedToken) => {
       req.user = decodedToken;
-      return db
-        .collection("users")
-        .where("userId", "==", req.user.uid)
-        .limit(1)
-        .get();
-    })
-    .then((data) => {
-      req.user.handle = data.docs[0].handle;
-      return next();
-    })
-    .catch((err) => {
-      console.error("Error while verify token");
-      return res.status(403).json(err);
+      let sql = `SELECT * FROM users WHERE handle = '${req.user.uid}'`;
+      mysqldb.query(sql, (err, result) => {
+        if (err) {
+          console.error(err);
+          return res.status(403).json(err);
+        }
+        req.user.id = result[0].user_id;
+        req.user.handle = result.handle;
+        return next();
+      });
+
     });
 };
