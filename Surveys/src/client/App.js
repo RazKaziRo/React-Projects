@@ -22,6 +22,10 @@ import login from "./pages/login";
 import signup from "./pages/signup";
 import { themeFile } from "./util/theme";
 
+//Redux
+import { Provider } from "react-redux";
+import store from "./redux/store";
+
 // Configure JSS
 const jss = create({ plugins: [...jssPreset().plugins, rtl()] });
 const theme = createTheme(themeFile);
@@ -37,36 +41,38 @@ if (token) {
     authenticated = true;
   }
 }
-console.log("IN APP"  + authenticated);
+console.log("IN APP" + authenticated);
 
 class App extends React.Component {
   render() {
     return (
       <MuiThemeProvider theme={theme}>
-        <StylesProvider jss={jss}>
-          <div className="root-container">
-            <Router>
-              <Navbar />
-              <div className="body-container">
-                <Switch>
-                  <Route exact path="/" component={home} />
-                  <AuthRoute
-                    exact
-                    path="/login"
-                    component={login}
-                    authenticated={authenticated}
-                  />
-                  <AuthRoute
-                    exact
-                    path="/signup"
-                    component={signup}
-                    authenticated={authenticated}
-                  />
-                </Switch>
-              </div>
-            </Router>
-          </div>
-        </StylesProvider>
+        <Provider store={store}>
+          <StylesProvider jss={jss}>
+            <div className="root-container">
+              <Router>
+                <Navbar />
+                <div className="body-container">
+                  <Switch>
+                    <Route exact path="/" component={home} />
+                    <AuthRoute
+                      exact
+                      path="/login"
+                      component={login}
+                      authenticated={authenticated}
+                    />
+                    <AuthRoute
+                      exact
+                      path="/signup"
+                      component={signup}
+                      authenticated={authenticated}
+                    />
+                  </Switch>
+                </div>
+              </Router>
+            </div>
+          </StylesProvider>
+        </Provider>
       </MuiThemeProvider>
     );
   }

@@ -14,10 +14,6 @@ const {
 const { json } = require("express");
 
 exports.getAllUsers = (req, res) => {
-  /*db.collection("users")
-    .orderBy("createdAt", "desc")
-    .get()*/
-
   let sql = "SELECT * FROM users";
   return mysqldb.query(sql, (err, rows) => {
     if (err) {
@@ -174,28 +170,20 @@ exports.getSingleUser = (req, res) => {
 
 exports.getAuthenticatedUser = (req, res) => {
   let userData = {};
-  db.doc(`/users/${req.user.handle}`)
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        userData.credentials = doc.data();
-        return db
-          .collection("usersResopns")
-          .where("userHandle", "==", req.user.handle)
-          .get();
-      }
-    })
-    .then((data) => {
-      userData.respons = [];
-      data.forEach((doc) => {
-        userData.respons.push(doc.data());
-      });
-      return res.json(userData);
-    })
-    .catch((err) => {
-      console.error(err);
-      json.status(500).json({ error: err.code });
-    });
+  let sql = `SELECT * FROM users WHERE handle = '${req.user.uid}'`;
+
+  mysqldb.query(sql, (err, result, fields) => {
+
+    if (err) {
+      throw err;
+    }
+    if (result.length > 0) {
+        userData.credentials = result[0];
+        return res.json(userData);
+    } else {
+      res.status(404).json({ messege: "No User found" });
+    }
+  });
 };
 
 //Upload a profile Image for user
@@ -255,7 +243,6 @@ exports.uploadImage = (req, res) => {
 
 exports.getAllUserWorkspaces = (req, res) =>{
   let sql = `SELECT * FROM workspaces WHERE id IN (SELECT workspace_id FROM users_workspaces WHERE user_id ='${req.params.userId}' )`;
-  console.log(sql);
   mysqldb.query(sql, (err, result, fields) => {
     if (err) {
       throw err;
@@ -263,7 +250,6 @@ exports.getAllUserWorkspaces = (req, res) =>{
     if (result.length > 0) {
         let workspaces = [];
         result.forEach((row) => {
-          console.log('row: '+ JSON.stringify(row));
           workspaces.push(
             row,
           );
