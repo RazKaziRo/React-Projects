@@ -24,7 +24,12 @@ import ListItemText from '@material-ui/core/ListItemText';
 import InboxIcon from '@material-ui/icons/MoveToInbox';
 import Divider from '@material-ui/core/Divider';
 import List from '@material-ui/core/List';
+import { Link } from '@material-ui/core';
 
+
+import { getUserData } from "../redux/actions/userActions";
+
+console.log('USER DATA: '+ getUserData);
 
 const drawerWidth = 240;
 
@@ -196,8 +201,11 @@ export default function PrimarySearchAppBar() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem 
+      onClick={handleMenuClose}
+      containerElement={<Link to="/signup" />}
+      >התחברות</MenuItem>
+      <MenuItem onClick={handleMenuClose}>הרשמה</MenuItem>
     </Menu>
   );
 

@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
 
-export class home extends Component {
+export class Profile extends Component {
     render() {
         return (
             <div>
-                <h1>HOME</h1>
+                
             </div>
         )
     }
 }
 
-export default home
+export default Profile

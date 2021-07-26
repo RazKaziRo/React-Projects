@@ -5,21 +5,23 @@ const { firebaseConfig } = require("../util/config");
 firebase.initializeApp(firebaseConfig);
 
 const {
+  dbQuery
+} = require('../util/sqlAsyncQuery');
+
+const {
   validateSignupData,
   validateLoginData,
   reduceUserDetails,
   reauthenticate,
 } = require("../util/validators");
 
-const { json } = require("express");
+//const { json } = require("express");
 
 exports.getAllUsers = (req, res) => {
+  
   let sql = "SELECT * FROM users";
-  return mysqldb.query(sql, (err, rows) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ error: err.code });
-    }
+  dbQuery(sql)
+  .then((rows)=>{
     let users = [];
     rows.forEach((row) => {
       users.push({
@@ -27,6 +29,9 @@ exports.getAllUsers = (req, res) => {
       });
     });
     return res.json(users);
+  }).catch(err =>{
+    console.error(err);
+    return res.status(500).json(err);
   });
 };
 
@@ -169,21 +174,21 @@ exports.getSingleUser = (req, res) => {
 //Get own user details
 
 exports.getAuthenticatedUser = (req, res) => {
+
   let userData = {};
   let sql = `SELECT * FROM users WHERE handle = '${req.user.uid}'`;
-
-  mysqldb.query(sql, (err, result, fields) => {
-
-    if (err) {
-      throw err;
-    }
+  dbQuery(sql)
+  .then(result =>{
     if (result.length > 0) {
-        userData.credentials = result[0];
-        return res.json(userData);
-    } else {
-      res.status(404).json({ messege: "No User found" });
-    }
-  });
+      userData.credentials = result[0];
+      return res.json(userData);
+  } else {
+    res.status(404).json({ messege: "No User found" });
+  }
+  }).catch(err =>{
+    console.error(err);
+    return res.status(500).json(err)
+  })
 };
 
 //Upload a profile Image for user
@@ -242,21 +247,22 @@ exports.uploadImage = (req, res) => {
 };
 
 exports.getAllUserWorkspaces = (req, res) =>{
+
   let sql = `SELECT * FROM workspaces WHERE id IN (SELECT workspace_id FROM users_workspaces WHERE user_id ='${req.params.userId}' )`;
-  mysqldb.query(sql, (err, result, fields) => {
-    if (err) {
-      throw err;
-    }
-    if (result.length > 0) {
-        let workspaces = [];
-        result.forEach((row) => {
-          workspaces.push(
-            row,
-          );
-        });
-        return res.json(workspaces);
-    } else {
-      res.status(404).json({ messege: "No Workspaces found" });
-    }
-  });
+  dbQuery(sql).then(rows =>{
+    if (rows.length > 0) {
+      let workspaces = [];
+      rows.forEach((row) => {
+        workspaces.push(
+          row,
+        );
+      });
+      return res.json(workspaces);
+  } else {
+    res.status(404).json({ messege: "No Workspaces found" });
+  }
+  }).catch(err =>{
+    console.error(err)
+    return res.status(500).json(err);
+  })
 }

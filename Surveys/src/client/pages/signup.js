@@ -8,10 +8,12 @@ import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { CircularProgress, Link } from "@material-ui/core";
+import { themeFile } from "../util/theme";
 
-import axios from "axios";
-import {themeFile} from '../util/theme'
 
+//Redux
+import { connect } from "react-redux";
+import { signupUser } from "../redux/actions/userActions";
 
 class signup extends Component {
   constructor() {
@@ -20,9 +22,14 @@ class signup extends Component {
       email: "",
       password: "",
       comfirmPassword: "",
-      loading: false,
       errors: {},
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.UI.errors){
+      this.setState({ errors: nextProps.UI.errors });
+    }
   }
 
   handleSubmit = (event) => {
@@ -35,24 +42,7 @@ class signup extends Component {
       password: this.state.password,
       confirmPassword: this.state.password,
     };
-    axios
-      .post("/signup", newUserData)
-      .then((res) => {
-        console.log('RES: '+ JSON.stringify(res));
-        localStorage.setItem("FBIdToken", `Bearer ${res.data.token}`);
-        console.log(localStorage);
-        this.setState({
-          loading: false,
-        });
-        this.props.history.push("/");
-      })
-      .catch((err) => {
-        console.log(JSON.stringify(err));
-        this.setState({
-          errors: err.response.data,
-          loading: false,
-        });
-      });
+    this.props.signupUser(newUserData, this.props.history);
   };
 
   handleChange = (event) => {
@@ -62,8 +52,8 @@ class signup extends Component {
   };
 
   render() {
-    const { classes } = this.props;
-    const { loading, errors } = this.state;
+    const { classes, UI:{loading} } = this.props;
+    const {  errors } = this.state;
 
     return (
       <div className={classes.formWrapper}>
@@ -135,6 +125,16 @@ class signup extends Component {
 
 signup.propTypes = {
   classes: PropTypes.object.isRequired,
+  user: PropTypes.object.isRequired,
+  UI: PropTypes.object.isRequired,
+  logoutUser: PropTypes.func.isRequired,
 };
 
-export default withStyles(themeFile)(signup);
+const mapStateToProps = (state) => ({
+  user: state.user,
+  UI: state.UI,
+});
+
+export default connect(mapStateToProps, { signupUser })(
+  withStyles(themeFile)(signup)
+);
