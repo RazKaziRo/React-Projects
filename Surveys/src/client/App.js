@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router,Route, Switch } from "react-router-dom";
 
 import "./App.scss";
 
@@ -7,6 +7,7 @@ import {
   createTheme,
   ThemeProvider as MuiThemeProvider,
 } from "@material-ui/core/styles";
+
 import { create } from "jss";
 import rtl from "jss-rtl";
 import { StylesProvider, jssPreset } from "@material-ui/core/styles";
@@ -17,7 +18,7 @@ import Navbar from "./components/Navbar";
 import AuthRoute from "./util/AuthRoute";
 
 //Pages
-import account from "./pages/account";
+import home from "./pages/home";
 import login from "./pages/login";
 import signup from "./pages/signup";
 import { themeFile } from "./util/theme";
@@ -41,8 +42,8 @@ if (token) {
     window.location.href = "/login";
   } else {
     store.dispatch({ type: SET_AUTHENTICATED });
-    axios.defaults.headers.common['Authorization'] = token;
-    store.dispatch(getUserData())
+    axios.defaults.headers.common["Authorization"] = token;
+    store.dispatch(getUserData());
   }
 }
 class App extends React.Component {
@@ -56,17 +57,9 @@ class App extends React.Component {
                 <Navbar />
                 <div className="body-container">
                   <Switch>
-                    <Route exact path="/account" component={account} />
-                    <AuthRoute
-                      exact
-                      path="/login"
-                      component={login}
-                    />
-                    <AuthRoute
-                      exact
-                      path="/signup"
-                      component={signup}
-                    />
+                    <Route exact path="/" component={home} />
+                    <AuthRoute exact path="/login" component={login} />
+                    <AuthRoute exact path="/signup" component={signup} />
                   </Switch>
                 </div>
               </Router>

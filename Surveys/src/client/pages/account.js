@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import Profile from '../components/Profile'
+//import Profile from '../components/Profile'
 
 export class account extends Component {
     render() {

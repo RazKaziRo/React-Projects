@@ -4,16 +4,20 @@ import {connect } from 'react-redux';
 import { PropTypes } from 'prop-types';
 
 const AuthRoute = ({ component : Component, authenticated, ...rest }) => (
-  <Route
+
+<Route
     {...rest}
     render = {(props) => authenticated === true ? <Redirect to="/" /> : <Component {...props} />
     }
   />
+
 );
 
 const mapStateToProps = (state) =>({
-  authenticated: state.user.authendicated,
+  authenticated: state.user.authenticated,
+  user: state.user,
 });
+ 
 
 AuthRoute.propTypes = {
   user: PropTypes.object.isRequired,

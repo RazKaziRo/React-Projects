@@ -5,6 +5,7 @@ import {
   CLEAR_ERRORS,
   LOADING_UI,
   SET_UNAUTHENTICATED,
+  LOADING_USER,
 } from "../types";
 
 export const loginUser = (userData, history) => (dispatch) => {
@@ -15,7 +16,7 @@ export const loginUser = (userData, history) => (dispatch) => {
       setAuthoriztionHeader(res.data.token);
       dispatch(getUserData());
       dispatch({ type: CLEAR_ERRORS });
-      history.push("/account");
+      history.push("/");
     })
     .catch((err) => {
       console.log("ERR: " + err);
@@ -35,7 +36,7 @@ export const signupUser = (newUserData, history) => (dispatch) => {
       setAuthoriztionHeader(res.data.token);
       dispatch(getUserData());
       dispatch({ type: CLEAR_ERRORS });
-      history.push("/account");
+      history.push("/");
     })
     .catch((err) => {
       console.log("ERR: " + err);
@@ -54,6 +55,7 @@ export const logoutUser = () => (dispatch) => {
 };
 
 export const getUserData = () => (dispatch) => {
+  dispatch({type: LOADING_USER});
   axios
     .get("/user")
     .then((res) => {
